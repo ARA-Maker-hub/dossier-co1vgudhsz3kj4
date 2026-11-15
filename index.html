@@ -299,7 +299,7 @@ input::placeholder,textarea::placeholder{font-size:17px;font-weight:700}
 .cbt{font-family:RB;font-size:22px;color:#e8d9b8;margin-bottom:8px}
 .codebox .odfb{color:#e8d9b8}
 .cell.key::after{content:'🔑';position:absolute;right:3px;bottom:1px;font-size:11px}
-</style></head><body>
+</style><link rel="stylesheet" href="num.css"><script src="gates.js"></script><script src="num.js"></script></head><body>
 <div id="app">
 <!-- OUVERTURE -->
 <section class="scr on" id="intro">
@@ -399,25 +399,27 @@ function stopVoice(){
   if(curAudio){try{curAudio.pause()}catch(e){}curAudio=null}
   if(curFin){var f=curFin;curFin=null;f()}
 }
+function voxUrl(k){var n=k-100;return 'v/greffier_'+(n<10?'0':'')+n+'.mp3'}
 function loadVox(k){
   if(vbuf[k])return vbuf[k];
+  if(k>=100){vbuf[k]=fetch(voxUrl(k)).then(function(r){if(!r.ok)throw 'nofile';return r.arrayBuffer()}).then(function(ab){return new Promise(function(res,rej){AC.decodeAudioData(ab,res,rej)})});return vbuf[k]}
   var b=atob(VOX[k].split(',')[1]),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
   vbuf[k]=new Promise(function(res,rej){AC.decodeAudioData(u.buffer,res,rej)});return vbuf[k];
 }
 function say(text,k){
   return new Promise(function(res){
     var done=false;function fin(){if(!done){done=true;if(curFin===fin)curFin=null;duck(false);res()}}
-    if(!soundOn||!VOX[k]){fin();return}
+    if(!soundOn||(k<100&&!VOX[k])){fin();return}
     duck(true);curFin=fin;
     function viaElement(){
-      try{var a=new Audio(VOX[k]);curAudio=a;a.onended=fin;a.onerror=function(){toast('Audio indisponible : touche « Relire ».');fin()};
+      try{var a=new Audio(k>=100?voxUrl(k):VOX[k]);curAudio=a;a.onended=fin;a.onerror=function(){toast('Audio indisponible : touche « Relire ».');fin()};
         var p=a.play();if(p&&p.catch)p.catch(function(){toast('Audio bloqué : touche « Relire ».');fin()})}catch(e){fin()}
     }
     try{
       if(AC&&AC.state==='suspended')AC.resume();
       loadVox(k).then(function(buf){
         if(done)return;var s=AC.createBufferSource();s.buffer=buf;s.connect(AC.destination);s.onended=fin;curSrc=s;s.start();
-      }).catch(viaElement);
+      }).catch(function(e){if(e==='nofile'){fin();return}viaElement()});
     }catch(e){viaElement()}
     setTimeout(fin,40000);
   });
@@ -509,12 +511,12 @@ function hx(s){var x=2166136261;for(var i=0;i<s.length;i++){x^=s.charCodeAt(i);x
 var J1={od:1,gr:1,n:1,title:'Ne touchez à rien',kind:'DEVINER',
  text:['Procès-verbal n° 1. Ne touchez à rien.','Madame Odette de Pelmont-Duvet est morte cette nuit, un sourire aux lèvres, dans son fauteuil Louis XV. Six chats l’entourent. Aucun ne semble trop affecté.','L’inspectrice est au ski. Vous voilà donc en charge : stagiaire. Ne touchez à rien, sauf si c’est intéressant.','Sur le guéridon, une bougie brûle encore. Vous en avez vingt-quatre. Le hasard n’existe pas.','Voici votre énigme. Je pleure sans avoir de chagrin. Plus je travaille, moins il reste de moi. On me souffle dessus pour me faire taire. Qui suis-je ?'],
  puzzle:null,sol:['bougie'],hint:'Pensez à ce qui brûle encore sur le guéridon.',ok:'Vous pouvez allumer la bougie du jour.'};
-ODETTE.unshift(J1);
+ODETTE.unshift(J1);if(window.AVN){window.AVN.days.forEach(function(d){ODETTE.push(d)});for(var gk in window.AVN.gates)GATE[gk]=window.AVN.gates[gk]}
 var SOL={25:['3','trois','casier 3'],26:['anselme pouls','pouls','docteur pouls'],27:['cabane'],28:['genoux','chaussette'],30:['elle vit','ellevit'],31:['odette']};
 ODETTE.forEach(function(d){if(SOL[d.n])d.sol=SOL[d.n]});
 function nrm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
 function okMsg(d){return '<b>✓ Exact.</b> '+(d.ok||'')}
-function odAns(d,v){
+function odAns(d,v){if(d.wd&&!d.ans)return '<div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';
   var n=d.n,h='<input data-save="a'+n+'" placeholder="Votre réponse" value="'+v+'">';
   if(d.sol)h+='<button class="btn" data-act="check" data-n="'+n+'">Valider</button><div class="odfb" id="odfb'+n+'">'+(store.g('ok'+n)==='1'?okMsg(d):'')+'</div>';
   return h;
@@ -546,14 +548,14 @@ function deepLink(){
 $('#dlist').addEventListener('click',function(e){
   var b=e.target.closest?e.target.closest('[data-g]'):null;if(!b)return;
   var g=b.getAttribute('data-g');
-  if(g==='reseal'){var n=b.getAttribute('data-n');['u','od','ok','tr','a'].forEach(function(p){store.s(p+n,'')});curDay=null;renderDays();toast('Dossier rescellé.');return}
+  if(g==='reseal'){var n=b.getAttribute('data-n');['u','od','ok','tr','a','ws'].forEach(function(p){store.s(p+n,'')});curDay=null;renderDays();toast('Dossier rescellé.');return}
   var inp=$('#gcode'),fb=$('#gfb'),r=tryCode(inp?inp.value:'');
   if(typeof r==='number'){ding();renderDays();return}
   oops();if(inp){inp.classList.add('shake');setTimeout(function(){inp.classList.remove('shake')},400)}
   if(fb)fb.textContent=(r.indexOf('early')===0)?'Ce dossier est scellé : il s’ouvre le '+(r.slice(6)==='1'?'1er':r.slice(6))+' décembre.':'Code inconnu.';
 });
 var odRun=0,odCur=0;
-function ODIDX(n){return n===1?15:n>31?14:n-25+7}
+function ODIDX(n){return n===1?15:n>31?14:n<25?100+n:n-25+7}
 function odFind(n){for(var i=0;i<ODETTE.length;i++)if(ODETTE[i].n===n)return ODETTE[i];return null}
 function ensureAC(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}}
 function odParas(d){return d.text.map(function(t){return '<p>'+fmtL(t)+'</p>'}).join('')}
@@ -613,7 +615,7 @@ var CATOK=[0,5,3,4,1,2];
 var HUSB=[['Gaston','🧓'],['Hubert','👴'],['Raymond','🧔']];
 var DEATH=['Chute d’échelle','Champignon','Noyade'];
 var CLUE31=['Devise','Biscotte','« Son neveu »','Mimosa','29 novembre','Doyenne'],LET31=['O','D','E','T','T','E'];
-function odW(d){
+function odW(d){if(window.AVN&&AVN.has(d.n))return AVN.html(d);
   var n=d.n,h='<div class="wg" id="wg'+n+'" data-n="'+n+'">';
   if(n===26)h+='<div class="mirbox"><div class="mirs" id="mirs">Anselme Pouls</div></div><button class="btn ghost" data-w="mir">🪞 Passer devant le miroir</button>';
   else if(n===30){
@@ -653,7 +655,7 @@ function wRender(n){
   }
   return h;
 }
-function odInit(n){if(n>=27&&n<=29&&$('#wg'+n))$('#wg'+n).innerHTML=wRender(n)}
+function odInit(n){if(window.AVN&&AVN.has(n)){AVN.init(n);return}if(n>=27&&n<=29&&$('#wg'+n))$('#wg'+n).innerHTML=wRender(n)}
 function odCandles(seen){var h='<div class="candles" id="cdl">';for(var i=0;i<6;i++)h+='<i class="cd'+(seen?' on':'')+'">🕯️</i>';return h+'</div>'}
 function odCandle(k){var c=document.querySelectorAll('#cdl .cd');for(var i=0;i<c.length;i++)if(i<k)c[i].classList.add('on');blip(700,900,.12,.05)}
 function odFinale(){odCandle(6);var h=$('#cdl');ding();burst(h,['🎆','✨','🥂','🐾','🕯️'])}
@@ -682,7 +684,7 @@ function odSheet(d,first){
   if(d.hier)h+='<div class="odhier">Hier : '+d.hier+'.</div>';
   if(d.minuit)h+=odCandles(seen);h+='<div class="odtxt" id="odt'+d.n+'">'+(seen?odParas(d):'')+'</div>';
   h+='<div class="odpuz" id="odp'+d.n+'"'+(seen?'':' hidden')+'>'+odPuz(d)+(d.minuit?'':odAns(d,v))+'</div>';
-  h+='<div class="odbtns" id="odb'+d.n+'"></div></div>';return h;
+  h+='<div class="odbtns" id="odb'+d.n+'"></div>'+(d.minuit?'':'<div class="pv29">Procès-verbal établi le 29 novembre.</div>')+'</div>';return h;
 }
 var curDay=null;
 function fmtX(t,s){return t.replace(/\s+(?=\d\)\s)/g,s).replace(/([.!])\s+(?=[^.!?]*\?\s*$)/,'$1'+s).replace(/\.\s+(?=Prenez )/,'.'+s)}
@@ -747,5 +749,6 @@ var DL=deepLink();renderDays();bindSave();
 if(DL){store.s('seen','1');$('#intro').classList.remove('on');$('#book').classList.add('on');if(DL==='early')toast('Ce dossier est encore scellé.')}
 if(store.g('snd')==='0'){setSound(false)}
 if(location.hash==='#carnet'||(store.g('seen')==='1'&&location.hash!=='#intro')){$('#intro').classList.remove('on');$('#book').classList.add('on')}
+window.AV={store:store,$:$,say:say,ding:ding,oops:oops,blip:blip,miaou:miaou,burst:burst,toast:toast,okMsg:okMsg,odFind:odFind,ac:function(){ensureAC();try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}return AC}};
 })();
 </script></body></html>
