@@ -310,6 +310,9 @@ input::placeholder,textarea::placeholder{font-size:17px;font-weight:700}
 #welcome .wi b{flex:none;font-size:30px;line-height:1;width:38px;text-align:center}
 #welcome .wi p{font-size:17px;font-weight:700;line-height:1.38;color:#2c2720}
 #welcome .wi p i{font-style:normal;color:var(--blood)}
+.wlet{font-family:RB,SE,cursive;font-size:25px;line-height:1.12;color:#2c2720;margin-top:16px}
+.sheet .btn.rl{width:auto;display:inline-block;margin:6px 0 4px;padding:8px 14px;font-size:15px;color:#4a3a22;border-color:#6b5434}
+.codebox+.btn.ghost{color:#e8d9b8;border-color:#8a7348;margin-top:14px}
 #welcome .btn{margin-top:12px}
 #welcome .btn.ghost{color:#4a3a22;border-color:#6b5434}
 #welcome .wsig{font-family:RB,SE,cursive;font-size:30px;line-height:1.05;color:var(--violet);text-align:center;margin-top:18px}
@@ -330,7 +333,7 @@ input::placeholder,textarea::placeholder{font-size:17px;font-weight:700}
  <button class="btn ghost" id="wtest">Tester le son</button>
  <div class="wi" id="wins"><b>📲</b><p>Ajoute ce carnet à ton <i>écran d’accueil</i> : touche le bouton Partager, puis « Sur l’écran d’accueil ». Il s’ouvrira comme une application.</p></div>
  <div class="wi"><b>🕯️</b><p>Chaque jour, ouvre le carnet et touche <i>« Scanner un QR »</i> devant la case du jour. Si ça ne marche pas, tape le code à 6 chiffres.</p></div>
- <div class="wsig">Fait avec beaucoup d’amour<br>par Driss &amp; Claude 😉</div>
+ <div class="wlet">Nath,<br>Chaque année, tu me prépares de jolis calendriers de l’Avent. Cette fois, c’est mon tour.<br>Il y a six chats, quelques menteurs et une stagiaire qui n’a pas fini de nous surprendre.<br>Merci de faire de notre maison un endroit où l’on joue encore.<br>Je t’aime.</div><div class="wsig">Fait avec beaucoup d’amour<br>par Driss &amp; Claude 💜</div>
  <button class="btn" id="wgo">Ouvrir le dossier</button>
 </div></div></section>
 <!-- OUVERTURE -->
@@ -382,7 +385,7 @@ var mem={};
 var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
 var soundOn=true, AC=null, master=null, rainGain=null, RAIN=.03, DUCK=.012;
 function duck(on){if(rainGain&&AC&&soundOn){rainGain.gain.cancelScheduledValues(AC.currentTime);rainGain.gain.linearRampToValueAtTime(on?DUCK:RAIN,AC.currentTime+.4)}}
-function toast(t){var e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},2600)}
+function toast(t,ms){var e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},(ms||2600))}
 /* ---------- audio ---------- */
 function startAudio(){audioPlayback();
   try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){AC=null;return}
@@ -717,7 +720,7 @@ $('#dlist').addEventListener('click',function(e){
 function odSheet(d,first){
   var seen=store.g('od'+d.n)==='1',v=(store.g('a'+d.n)||'').replace(/"/g,'&quot;');
   var h='<div class="sheet od'+(d.gr?' gr':'')+'">'+(first?'<span class="tag">Aujourd’hui</span>':'')+'<div class="day"><div class="no">'+(d.n>31?'✶':d.n)+'</div><div class="ds"><div class="tt">'+d.title+'</div><div class="su">'+(d.minuit?'Message d’Odette':'Énigme '+KIND[d.kind])+'</div></div></div>';
-  h+='<span class="odst">'+(d.minuit?'À minuit':d.gr?'Scellé levé':'Dossier rouvert')+'</span>';
+  h+='<button class="btn ghost rl" data-act="relire" data-n="'+d.n+'">↻ Relire (voix et texte)</button>';h+='<span class="odst">'+(d.minuit?'À minuit':d.gr?'Scellé levé':'Dossier rouvert')+'</span>';
   if(d.hier)h+='<div class="odhier">Hier : '+d.hier+'.</div>';
   if(d.minuit)h+=odCandles(seen);h+='<div class="odtxt" id="odt'+d.n+'">'+(seen?odParas(d):'')+'</div>';
   h+='<div class="odpuz" id="odp'+d.n+'"'+(seen?'':' hidden')+'>'+odPuz(d)+(d.minuit?'':odAns(d,v))+'</div>';
@@ -753,7 +756,7 @@ function renderDays(){
     h+='<button class="cell'+(o?' open':' lock')+(!test&&n===t?' today':'')+(n>=25?' od':'')+(ans?' done':'')+(GATE[n]&&store.g('u'+n)!=='1'?' key':'')+'"'+(o?' data-cal="open" data-n="'+n+'"':' disabled')+'>'+n+'</button>';
   }
   if(unlocked(31)){var mo=unlocked(32);h+='<button class="cell mid'+(mo?' open':' lock')+'"'+(mo?' data-cal="open" data-n="32"':' disabled')+'>✶ Minuit : le message d’Odette</button>'}
-  h+='</div>'+codeBox();
+  h+='</div>'+codeBox()+'<button class="btn ghost" data-refresh="1">↻ Mettre à jour l’app</button>';
   $('#dlist').innerHTML=h;
 }
 $('#dlist').addEventListener('click',function(e){
@@ -782,6 +785,12 @@ document.querySelectorAll('#tabs button').forEach(function(b){b.addEventListener
 /* mode test : 7 touches sur le titre */
 var tc=0,tt=0;$('#ttl').addEventListener('click',function(){var n=Date.now();if(n-tt>1500)tc=0;tt=n;tc++;if(tc>=7){tc=0;test=!test;store.s('test',test?'1':'0');renderDays();toast(test?'Mode test : tout est ouvert':'Mode test coupé')}});
 $('#replay').addEventListener('click',function(){location.hash='#intro';location.reload()});
+document.addEventListener('click',function(e){
+  var b=e.target.closest?e.target.closest('[data-refresh]'):null;if(!b)return;
+  toast('Mise à jour en cours…',4000);
+  var fs=['num.js','num.css','gates.js','qrscan.js',location.pathname];
+  Promise.all(fs.map(function(f){return fetch(f,{cache:'reload'}).catch(function(){return 0})})).then(function(){location.reload()});
+});
 /* ---------- scan QR (caméra, jsQR chargé à la demande) ---------- */
 var qrStream=null,qrRun=false,qrLoad=null;
 function loadJsQR(){if(window.jsQR)return Promise.resolve();if(qrLoad)return qrLoad;qrLoad=new Promise(function(res,rej){var s=document.createElement('script');s.src='qrscan.js';s.onload=res;s.onerror=function(){qrLoad=null;rej()};document.head.appendChild(s)});return qrLoad}
@@ -803,7 +812,7 @@ function qrStart(){
         if(r&&r.data){var code=qrCode(r.data);if(code){
           var res=tryCode(code);
           if(typeof res==='number'){qrStop();ding();renderDays();return}
-          qrStop();oops();toast(res.indexOf('early')===0?'Ce dossier est encore scellé.':'Code inconnu.');return}}
+          qrStop();oops();toast(res.indexOf('early')===0?'Ce dossier est encore scellé.':'Code inconnu.',res.indexOf('early')===0?8000:0);return}}
       }
       setTimeout(tick,120);
     })();
@@ -815,7 +824,7 @@ document.addEventListener('click',function(e){
   if(e.target.id==='qrx')qrStop();
 });
 var DL=deepLink();renderDays();bindSave();
-if(DL){store.s('seen','1');$('#intro').classList.remove('on');$('#book').classList.add('on');if(DL==='early')toast('Ce dossier est encore scellé.')}
+if(DL){store.s('seen','1');$('#intro').classList.remove('on');$('#book').classList.add('on');if(DL==='early')toast('Ce dossier est encore scellé.',8000)}
 if(store.g('snd')==='0'){setSound(false)}
 if(location.hash==='#carnet'||(store.g('seen')==='1'&&location.hash!=='#intro')){$('#intro').classList.remove('on');$('#book').classList.add('on')}
 /* ---------- accueil unique ---------- */
