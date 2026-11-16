@@ -162,3 +162,5 @@
 .odfb,.pvl{white-space:pre-line}
 .scoderow{display:flex;gap:8px;max-width:320px;margin:12px auto 0}
 .scode{flex:1;min-width:0;font-weight:700;font-size:20px;text-align:center;letter-spacing:.2em;padding:10px;border:2px solid #4B1F7A;border-radius:6px;background:#fff8;color:#2c2720}
+
+.odtxt p{white-space:pre-line}

@@ -557,9 +557,10 @@ var J1={od:1,gr:1,n:1,title:'Ne touchez à rien',kind:'DEVINER',
  puzzle:null,sol:['bougie'],hint:'Pensez à ce qui brûle encore sur le guéridon.',ok:'Vous pouvez allumer la bougie du jour.'};
 ODETTE.unshift(J1);if(window.AVN){window.AVN.days.forEach(function(d){ODETTE.push(d)});for(var gk in window.AVN.gates)GATE[gk]=window.AVN.gates[gk]}
 var SOL={25:['3','trois','casier 3'],26:['anselme pouls','pouls','docteur pouls'],27:['cabane'],28:['genoux','chaussette'],30:['elle vit','ellevit'],31:['odette']};
+ODETTE.push({od:1,n:240,no:24,title:'Affaire classée',su:'Procès-verbal du matin',gr:1,nopv:1,wd:1,btn:'Classer l’affaire',ok:'Affaire classée. Profitez-en : je ne promets rien pour cet après-midi.',text:['Procès-verbal n° 24. Affaire classée.','Maître Tabellion avoue.\nIl voulait « adopter les chats, et la maison avec ».\nIl est arrêté.\nPincette lui a craché dessus : ce n’est pas une preuve, mais ça soulage.','Faux testament, fausse date, fausse modestie :\nle notaire a tout signé de sa main.\nLe dossier est complet, le coupable est menotté et les chats ont repris leur sieste.','Joyeux réveillon, stagiaire Rosato.\nMangez quelque chose, dormez un peu.\nJe range mon stylo.']});
 ODETTE.forEach(function(d){if(SOL[d.n])d.sol=SOL[d.n]});
 function nrm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
-function okMsg(d){return '<b>✓ Exact.</b> '+(d.ok||'')}
+function okMsg(d){return d.btn?d.ok:'<b>✓ Exact.</b> '+(d.ok||'')}
 var backT=null;
 function afterWin(d){
   if(!d||!d.gr||d.n>24)return;
@@ -570,7 +571,7 @@ function afterWin(d){
     backT=setTimeout(function(){if(curDay===d.n){curDay=null;odAbort();renderDays()}},5000);
   });
 }
-function odAns(d,v){if(d.wd&&!d.ans)return '<div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';
+function odAns(d,v){if(d.btn)return '<button class="btn" data-act="classer" data-n="'+d.n+'">'+d.btn+'</button><div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';if(d.wd&&!d.ans)return '<div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';
   var n=d.n,h='<input data-save="a'+n+'" placeholder="Votre réponse" value="'+v+'">';
   if(d.sol)h+='<button class="btn" data-act="check" data-n="'+n+'">Valider</button><div class="odfb" id="odfb'+n+'">'+(store.g('ok'+n)==='1'?okMsg(d):'')+'</div>';
   return h;
@@ -602,14 +603,14 @@ function deepLink(){
 $('#dlist').addEventListener('click',function(e){
   var b=e.target.closest?e.target.closest('[data-g]'):null;if(!b)return;
   var g=b.getAttribute('data-g');
-  if(g==='reseal'){var n=b.getAttribute('data-n');['u','od','ok','tr','a','ws'].forEach(function(p){store.s(p+n,'')});curDay=null;renderDays();toast('Dossier rescellé.');return}
+  if(g==='reseal'){var n=b.getAttribute('data-n');['u','od','ok','tr','a','ws'].forEach(function(p){store.s(p+n,'')});if(n==='24'){store.s('od240','');store.s('ok240','')}curDay=null;renderDays();toast('Dossier rescellé.');return}
   var inp=$('#gcode'),fb=$('#gfb'),r=tryCode(inp?inp.value:'');
   if(typeof r==='number'){ding();renderDays();return}
   oops();if(inp){inp.classList.add('shake');setTimeout(function(){inp.classList.remove('shake')},400)}
   if(fb)fb.textContent=(r.indexOf('early')===0)?'Ce dossier est scellé : il s’ouvre le '+(r.slice(6)==='1'?'1er':r.slice(6))+' décembre.':'Code inconnu.';
 });
 var odRun=0,odCur=0;
-function ODIDX(n){return n===1?15:n>31?14:n<25?100+n:n-25+7}
+function ODIDX(n){return n===240?224:n===1?15:n>31?14:n<25?100+n:n-25+7}
 function odFind(n){for(var i=0;i<ODETTE.length;i++)if(ODETTE[i].n===n)return ODETTE[i];return null}
 function ensureAC(){audioPlayback();if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}}
 function odParas(d){return d.text.map(function(t){return '<p>'+fmtL(t)+'</p>'}).join('')}
@@ -733,12 +734,12 @@ $('#dlist').addEventListener('click',function(e){
 });
 function odSheet(d,first){
   var seen=store.g('od'+d.n)==='1',v=(store.g('a'+d.n)||'').replace(/"/g,'&quot;');
-  var h='<div class="sheet od'+(d.gr?' gr':'')+'">'+(first?'<span class="tag">Aujourd’hui</span>':'')+'<div class="day"><div class="no">'+(d.n>31?'✶':d.n)+'</div><div class="ds"><div class="tt">'+d.title+'</div><div class="su">'+(d.minuit?'Message d’Odette':'Énigme '+KIND[d.kind])+'</div></div></div>';
+  var h='<div class="sheet od'+(d.gr?' gr':'')+'">'+(first?'<span class="tag">Aujourd’hui</span>':'')+'<div class="day"><div class="no">'+(d.no||(d.n>31?'✶':d.n))+'</div><div class="ds"><div class="tt">'+d.title+'</div><div class="su">'+(d.minuit?'Message d’Odette':d.su||'Énigme '+KIND[d.kind])+'</div></div></div>';
   h+='<button class="btn ghost rl" data-act="relire" data-n="'+d.n+'">↻ Relire</button>';h+='<span class="odst">'+(d.minuit?'À minuit':d.gr?'Scellé levé':'Dossier rouvert')+'</span>';
   if(d.hier)h+='<div class="odhier">Hier : '+d.hier+'.</div>';
   if(d.minuit)h+=odCandles(seen);h+='<div class="odtxt" id="odt'+d.n+'">'+(seen?odParas(d):'')+'</div>';
   h+='<div class="odpuz" id="odp'+d.n+'"'+(seen?'':' hidden')+'>'+odPuz(d)+(d.minuit?'':odAns(d,v))+'</div>';
-  h+='<div class="odbtns" id="odb'+d.n+'"></div>'+(d.minuit?'':'<div class="pv29">Procès-verbal établi le 29 novembre.</div>')+'</div>';return h;
+  h+='<div class="odbtns" id="odb'+d.n+'"></div>'+(d.minuit||d.nopv?'':'<div class="pv29">Procès-verbal établi le 29 novembre.</div>')+'</div>';return h;
 }
 var curDay=null;
 function fmtX(t,s){return t.replace(/\s+(?=\d\)\s)/g,s).replace(/([.!])\s+(?=[^.!?]*\?\s*$)/,'$1'+s).replace(/\.\s+(?=Prenez )/,'.'+s).replace(/(Voici votre énigme\.)\s+/,'$1'+s)}
@@ -755,8 +756,9 @@ function renderDays(){
     else{
       var first=!test&&d.n===todayN();
       $('#dhint').textContent='';
-      $('#dlist').innerHTML=BK+(d.od?odSheet(d,first):plainSheet(d,first))+BK+(test&&GATE[d.n]?'<button class="btn ghost backc" data-g="reseal" data-n="'+d.n+'">↺ Resceller (mode test)</button>':'');bindSave();
-      if(d.od){odBtns(d.n,store.g('od'+d.n)==='1'?'seen':'new');odInit(d.n)}
+      var sh=d.od?odSheet(d,first):plainSheet(d,first),late=true;if(d.n===24){late=test||Date.now()>=new Date(2026,11,24,14,0,0).getTime();sh=odSheet(odFind(240),first&&!late)+(late?odSheet(d,first):'')}
+      $('#dlist').innerHTML=BK+sh+BK+(test&&GATE[d.n]?'<button class="btn ghost backc" data-g="reseal" data-n="'+d.n+'">↺ Resceller (mode test)</button>':'');bindSave();
+      if(d.od){if(d.n===24)odBtns(240,store.g('od240')==='1'?'seen':'new');if(late){odBtns(d.n,store.g('od'+d.n)==='1'?'seen':'new');odInit(d.n)}}
       $('#p-days').scrollTop=0;return;
     }
   }
@@ -782,7 +784,7 @@ $('#dlist').addEventListener('click',function(e){
 $('#dlist').addEventListener('click',function(e){
   var b=e.target.closest?e.target.closest('[data-act]'):null;if(!b)return;
   var n=+b.getAttribute('data-n'),a=b.getAttribute('data-act');
-  if(a==='read'||a==='relire')odRead(n);else if(a==='skip')odSkip(n);else if(a==='check')odCheck(n);
+  if(a==='read'||a==='relire')odRead(n);else if(a==='skip')odSkip(n);else if(a==='check')odCheck(n);else if(a==='classer'){store.s('ok'+n,'1');var cd=odFind(n),cf=$('#odfb'+n);if(cf)cf.innerHTML=okMsg(cd);ding();burst($('#odp'+n))}
 });
 function bindSave(){
   document.querySelectorAll('[data-save]').forEach(function(el){

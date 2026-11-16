@@ -579,7 +579,7 @@ var DAYS=[
   p:{items:['melusine','baptiste','ginette','tabellion','pouls'],target:['melusine','baptiste','ginette','tabellion','pouls'],byId:byId(),log:[['22 h 30','véranda'],['23 h 15','porte'],['0 h 30','véranda'],['6 h 00','porte'],['7 h 20','porte']],ans:'Maître Tabellion'}},
 
  {n:24,title:'L’enquête n’est pas finie',kind:'REPÉRER',hier:'Maître Tabellion',wd:'pick',
-  text:[PV+'24. L’enquête n’est pas finie.','Maître Tabellion avoue. Il voulait « adopter les chats, et la maison avec ». Il est arrêté. Pincette lui a craché dessus : ce n’est pas une preuve, mais ça soulage.','Affaire classée. Presque. Regardez, en tout petit, au bas de cette page : « Procès-verbal établi le 29 novembre. » Madame est morte la nuit du 30. Qui rédige un procès-verbal avant les faits ?','Il reste sept jours. Les prochains procès-verbaux apparaîtront ici, un par jour. Je ne vous dis pas à quelle heure. Je ne dis rien. Je note.','Voici votre énigme. Pour le dossier, désignez le faussaire.'],
+  text:[PV+'24. L’enquête n’est pas finie.','Affaire classée. Presque. Regardez, en tout petit, au bas de cette page : « Procès-verbal établi le 29 novembre. » Madame est morte la nuit du 30. Qui rédige un procès-verbal avant les faits ?','Il reste sept jours. Les prochains procès-verbaux apparaîtront ici, un par jour. Je ne vous dis pas à quelle heure. Je ne dis rien. Je note.','Voici votre énigme. Pour le dossier, désignez le faussaire.'],
   hint:'Celui qui a sorti le testament du coffre.',ok:'Tabellion. Mais les dates ne collent pas, et l’enquête continue.',
   p:{items:VIDS.map(function(i){return {id:i,label:VIS[i][0],sub:VIS[i][1],img:vimg(i)}}),ok:['tabellion'],ans:'TABELLION',cols:3}}
 ];
