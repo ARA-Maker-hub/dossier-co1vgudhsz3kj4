@@ -217,6 +217,8 @@ input::placeholder,textarea::placeholder{font-size:17px;font-weight:700}
 .odbtns{display:flex;gap:10px;margin-top:12px}
 .odbtns .btn{margin-top:0;flex:1}
 .odbtns .btn.ghost{color:#4a3a22;border-color:#6b5434}
+.odbtns .btn.pvc:disabled{opacity:.4;filter:grayscale(.85);cursor:not-allowed}
+.odbtns .btn.pvc.cl:disabled{opacity:1;filter:none;background:none;color:#8c1d18;border:2px solid #8c1d18;font-weight:700;letter-spacing:.1em;text-transform:uppercase;transform:rotate(-2deg);cursor:default}
 
 /* ---- widgets J26-J31 ---- */
 .wg{position:relative;margin:10px 0 4px}
@@ -385,7 +387,7 @@ input::placeholder,textarea::placeholder{font-size:17px;font-weight:700}
 (function(){
 var DAYS=[{"n": 1, "title": "Ne touchez à rien", "kind": "DEVINER"}, {"n": 2, "title": "Le plan du manoir", "kind": "DÉDUIRE"}, {"n": 3, "title": "Six témoins à fourrure", "kind": "DÉDUIRE"}, {"n": 4, "title": "Six visiteurs, zéro modestie", "kind": "LOGIQUE"}, {"n": 5, "title": "Le neveu", "kind": "DÉCHIFFRER"}, {"n": 6, "title": "Mélusine ne fait que des dos", "kind": "DÉCHIFFRER"}, {"n": 7, "title": "La voisine aux jumelles", "kind": "LOGIQUE"}, {"n": 8, "title": "Quelle coïncidence", "kind": "DÉDUIRE"}, {"n": 9, "title": "Le docteur Pouls", "kind": "CALCULER"}, {"n": 10, "title": "L’encre qui se cache", "kind": "À FAIRE"}, {"n": 11, "title": "Combien de temps a-t-elle brûlé ?", "kind": "CALCULER"}, {"n": 12, "title": "Le testament", "kind": "REPÉRER"}, {"n": 13, "title": "Firmin ne parle qu’aux roses", "kind": "DÉCHIFFRER"}, {"n": 14, "title": "Pincette, la solitaire", "kind": "DÉDUIRE"}, {"n": 15, "title": "Le neveu a des dettes", "kind": "CALCULER"}, {"n": 16, "title": "Mélusine fait ses comptes", "kind": "CALCULER"}, {"n": 17, "title": "Le code du coffre", "kind": "DÉDUIRE"}, {"n": 18, "title": "L’autopsie", "kind": "DÉCHIFFRER"}, {"n": 19, "title": "La boîte de Firmin", "kind": "DÉDUIRE"}, {"n": 20, "title": "Quatre petits coupables", "kind": "LOGIQUE"}, {"n": 21, "title": "Il faisait combien, Madame ?", "kind": "CALCULER"}, {"n": 22, "title": "Je vous arrête", "kind": "REPÉRER"}, {"n": 23, "title": "Les trois clés", "kind": "DÉDUIRE"}, {"n": 24, "title": "L’enquête n’est pas finie", "kind": "REPÉRER"}];
 function $(s){return document.querySelector(s)}
-var store={g:function(k){try{return localStorage.getItem('sv_'+k)}catch(e){return null}},s:function(k,v){try{localStorage.setItem('sv_'+k,v)}catch(e){}}};
+var store={g:function(k){try{return localStorage.getItem('sv_'+k)}catch(e){return null}},s:function(k,v){try{localStorage.setItem('sv_'+k,v)}catch(e){}if(v==='1'){var pm=/^ok(\d+)$/.exec(k);if(pm)pvRefresh(+pm[1])}}};
 var mem={};
 var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
 var soundOn=true, AC=null, master=null, rainGain=null, RAIN=.03, DUCK=.012, rainOff=false;
@@ -567,10 +569,7 @@ function afterWin(d){
   if(!d||!d.gr||d.n>24)return;
   var fb=$('#odfb'+d.n);if(fb)fb.innerHTML+='<br><b>L’aventure continue demain.</b>';
   clearTimeout(backT);
-  say('',200).then(function(){
-    clearTimeout(backT);
-    backT=setTimeout(function(){if(curDay===d.n){curDay=null;odAbort();renderDays()}},5000);
-  });
+  say('',200);
 }
 function odAns(d,v){if(d.btn)return '<button class="btn" data-act="classer" data-n="'+d.n+'">'+d.btn+'</button><div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';if(d.wd&&!d.ans)return '<div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';
   var n=d.n,h='<input data-save="a'+n+'" placeholder="Votre réponse" value="'+v+'">';
@@ -604,7 +603,7 @@ function deepLink(){
 $('#dlist').addEventListener('click',function(e){
   var b=e.target.closest?e.target.closest('[data-g]'):null;if(!b)return;
   var g=b.getAttribute('data-g');
-  if(g==='reseal'){var n=b.getAttribute('data-n');['u','od','ok','tr','a','ws'].forEach(function(p){store.s(p+n,'')});if(n==='24'){store.s('od240','');store.s('ok240','')}curDay=null;renderDays();toast('Dossier rescellé.');return}
+  if(g==='reseal'){var n=b.getAttribute('data-n');['u','od','ok','cl','tr','a','ws'].forEach(function(p){store.s(p+n,'')});if(n==='24'){store.s('od240','');store.s('ok240','');store.s('cl240','')}curDay=null;renderDays();toast('Dossier rescellé.');return}
   var inp=$('#gcode'),fb=$('#gfb'),r=tryCode(inp?inp.value:'');
   if(typeof r==='number'){ding();renderDays();return}
   oops();if(inp){inp.classList.add('shake');setTimeout(function(){inp.classList.remove('shake')},400)}
@@ -620,8 +619,12 @@ function odBtns(n,st){
   var b=$('#odb'+n);if(!b)return;
   if(st==='new')b.innerHTML='<button class="btn" data-act="read" data-n="'+n+'">Ouvrir le procès-verbal</button>';
   else if(st==='reading')b.innerHTML='<button class="btn ghost" data-act="relire" data-n="'+n+'">↻ Relire</button><button class="btn ghost" data-act="skip" data-n="'+n+'">Passer</button>';
-  else b.innerHTML='<button class="btn ghost" data-act="relire" data-n="'+n+'">↻ Relire</button>';
+  else b.innerHTML=pvBtn(n);
 }
+function pvHas(n){var d=odFind(n);return !!d&&!d.minuit}
+function pvBtn(n){if(!pvHas(n))return '<button class="btn ghost" data-act="relire" data-n="'+n+'">↻ Relire</button>';if(store.g('cl'+n)==='1')return '<button class="btn ghost pvc cl" disabled>✓ PV classé</button>';return '<button class="btn pvc" data-act="pv" data-n="'+n+'"'+(store.g('ok'+n)==='1'?'':' disabled')+'>Classer le PV</button>'}
+function pvRefresh(n){var b=$('#odb'+n);if(!b||!b.querySelector('.pvc'))return;b.innerHTML=pvBtn(n)}
+function pvClose(n){if(store.g('ok'+n)!=='1'||store.g('cl'+n)==='1')return;store.s('cl'+n,'1');var b=$('#odb'+n);if(b)b.innerHTML=pvBtn(n);ding();burst(b);if(n===240)return;clearTimeout(backT);backT=setTimeout(function(){if(curDay===n){curDay=null;odAbort();renderDays()}},2200)}
 function odStatic(n){var d=odFind(n);if(!d||!$('#odt'+n))return;$('#odt'+n).innerHTML=odParas(d);$('#odp'+n).hidden=false;odBtns(n,'seen')}
 function odAbort(){if(odCur){var n=odCur;odCur=0;odRun++;stopVoice();odStatic(n);store.s('od'+n,'1')}}
 function odSkip(n){odRun++;odCur=0;stopVoice();odStatic(n);store.s('od'+n,'1')}
@@ -703,7 +706,7 @@ function wRender(n){
     h+='</div><p class="wcap">'+(s.done?'Tous au bon endroit. Chaussette est bien sur les genoux de Madame.':s.bad?'Quelque chose cloche. Reprenez les indices.':'Touchez un chat, puis sa cachette.')+'</p>';
   }else if(n===29){
     var s=wget(29,{sel:-1,ok:[0,0,0]});
-    h+='<div class="lnk"><div>';
+    if(s.ok[0]&&s.ok[1]&&s.ok[2]&&store.g('ok29')!=='1')store.s('ok29','1');h+='<div class="lnk"><div>';
     HUSB.forEach(function(x,i){h+='<button class="ct lb'+(s.ok[i]?' ok':'')+(s.sel===i?' sel':'')+'" data-w="hus" data-i="'+i+'">'+x[1]+' '+x[0]+'</button>'});
     h+='</div><div>';
     DEATH.forEach(function(x,i){h+='<button class="ct lb'+(s.ok[i]?' ok':'')+(s.shake===i?' shake':'')+'" data-w="dth" data-i="'+i+'">'+(s.ok[i]?HUSB[i][0]+' ← ':'')+x+'</button>'});
@@ -730,7 +733,7 @@ $('#dlist').addEventListener('click',function(e){
     wset(28,s);wrap.innerHTML=wRender(28);return}
   if(w==='hus'){s=wget(29,{sel:-1,ok:[0,0,0]});if(s.ok[i])return;s.sel=(s.sel===i)?-1:i;s.shake=-1;wset(29,s);wrap.innerHTML=wRender(29);return}
   if(w==='dth'){s=wget(29,{sel:-1,ok:[0,0,0]});if(s.sel<0||s.ok[i])return;
-    if(s.sel===i){s.ok[i]=1;s.sel=-1;s.shake=-1;wset(29,s);blip(400,800,.2,.1);wrap.innerHTML=wRender(29);if(s.ok[0]&&s.ok[1]&&s.ok[2]){ding();burst(wrap)}}
+    if(s.sel===i){s.ok[i]=1;s.sel=-1;s.shake=-1;wset(29,s);blip(400,800,.2,.1);wrap.innerHTML=wRender(29);if(s.ok[0]&&s.ok[1]&&s.ok[2]){store.s('ok29','1');ding();burst(wrap)}}
     else{oops();s.shake=i;wset(29,s);wrap.innerHTML=wRender(29)}return}
 });
 function odSheet(d,first){
@@ -785,7 +788,7 @@ $('#dlist').addEventListener('click',function(e){
 $('#dlist').addEventListener('click',function(e){
   var b=e.target.closest?e.target.closest('[data-act]'):null;if(!b)return;
   var n=+b.getAttribute('data-n'),a=b.getAttribute('data-act');
-  if(a==='read'||a==='relire')odRead(n);else if(a==='skip')odSkip(n);else if(a==='check')odCheck(n);else if(a==='classer'){store.s('ok'+n,'1');var cd=odFind(n),cf=$('#odfb'+n);if(cf)cf.innerHTML=okMsg(cd);ding();burst($('#odp'+n))}
+  if(a==='pv')pvClose(n);else if(a==='read'||a==='relire')odRead(n);else if(a==='skip')odSkip(n);else if(a==='check')odCheck(n);else if(a==='classer'){store.s('ok'+n,'1');var cd=odFind(n),cf=$('#odfb'+n);if(cf)cf.innerHTML=okMsg(cd);ding();burst($('#odp'+n))}
 });
 function bindSave(){
   document.querySelectorAll('[data-save]').forEach(function(el){
