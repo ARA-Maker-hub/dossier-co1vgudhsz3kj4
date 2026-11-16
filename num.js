@@ -19,7 +19,7 @@ function win(n,ans){
   var a=A(),d=dayOf(n);if(!d||solved(n))return;
   a.store.s('ok'+n,'1');a.store.s('a'+n,ans||'ok');
   var fb=$id('odfb'+n);if(fb)fb.innerHTML=a.okMsg(d);
-  if(d.gr)a.say('',16);else a.ding();
+  if(d.gr)a.say('',16).then(function(){if(a.afterWin)a.afterWin(d)});else a.ding();
   a.burst($id('wg'+n),['🕯️','✨','⭐']);
 }
 function miss(n,el){
