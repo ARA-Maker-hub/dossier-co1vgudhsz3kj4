@@ -270,7 +270,7 @@ T.spot={
  html:function(d,s){
   var done=solved(d.n),f=done?['date','names','sig']:s.f;
   function sp(k,t,cls){var on=f.indexOf(k)>=0;return '<span class="sp'+(on?' found':'')+(cls?' '+cls:'')+'" data-a="s" data-v="'+k+'">'+t+'</span>'}
-  var h='<div class="doc"><p class="dh">Testament</p><p>Fait à '+sp('d1','Saint-Matou')+', le '+sp('date','31 novembre')+'.</p><p>Je lègue mes biens à qui soignera mes '+sp('d2','six chats')+' : '+sp('names','Chaussette, Pincette, Nala, HK, Yin, Ciboulette et Biscotte')+'.</p><p class="sig">Signé : '+sp('sig','Odette de P.-D.','blue')+'</p></div>';
+  var h='<div class="doc"><p class="dh">Testament</p><p>Fait à '+sp('d1','Saint-Matou')+', le '+sp('date','31 novembre')+'.</p><p>Je lègue mes biens à celui ou celle qui prendra soin de mes '+sp('d2','six chats')+' : '+sp('names','Chaussette, Pincette, Nala, HK, Yin, Ciboulette et Biscotte')+'.</p><p class="sig">Signé : '+sp('sig','Odette de P.-D.','blue')+'</p></div>';
   return h+'<p class="wcap">'+(done?'Les trois détails sont repérés.':'Détails repérés : '+f.length+'/3.')+'</p>';
  },
  act:function(d,s,a,b){
@@ -484,7 +484,7 @@ var DAYS=[
   p:{items:VIDS.slice(),target:['melusine','baptiste','ginette','firmin','tabellion','pouls'],byId:byId(),ans:'Mélusine, Baptiste, Ginette, Firmin, Tabellion, Pouls'}},
 
  {n:5,title:'Le neveu',kind:'DÉCHIFFRER',hier:'Mélusine, Baptiste, Ginette, Firmin, Tabellion, Pouls',wd:'caesar',
-  text:[PV+'5. Le neveu.','Baptiste de Pelmont-Duvet, trente-quatre ans, « trader indépendant ». Son indépendance est totale, son portefeuille aussi. Il jure qu’il n’a rien pris. Sa poche gauche tinte quand il marche.','On a retrouvé ce mot froissé dans sa veste.','Voici votre énigme. Chaque lettre a été remplacée par la suivante dans l’alphabet : A est devenu B. Faites tourner la roue pour revenir en arrière.'],
+  text:[PV+'5. Le neveu.','Baptiste de Pelmont-Duvet, trente-quatre ans, « trader indépendant ». Son indépendance est totale, son portefeuille aussi. Il jure qu’il n’a rien pris. Sa poche gauche tinte quand il marche. La droite est vide et froide : on y a cherché quelque chose, sans le trouver.','On a retrouvé ce mot froissé dans sa veste.','Voici votre énigme. Chaque lettre a été remplacée par la suivante dans l’alphabet : A est devenu B. Faites tourner la roue pour revenir en arrière.'],
   hint:'Il faut reculer d’une lettre, pas plus.',ok:'Couverts d’argent. La poche gauche tintait pour une bonne raison.',
   p:{cipher:'DPVWFSUT E’BSHFOU',shift:1,ans:'COUVERTS D’ARGENT'}},
 
@@ -499,7 +499,7 @@ var DAYS=[
   p:{stmts:[['A','« Je ne suis jamais entrée chez Madame. »'],['B','« Je suis entrée par la chatière. »'],['C','« Je n’ai jamais utilisé la chatière. »']],truth:[false,false,true],door:{q:'Par où est-elle entrée ?',opts:[['chat','Par la chatière'],['porte','Par la porte d’entrée'],['veranda','Par la véranda']],ok:'veranda'},ans:'Oui, par la véranda restée ouverte'}},
 
  {n:8,title:'Quelle coïncidence',kind:'DÉDUIRE',hier:'oui, par la véranda restée ouverte',wd:'pick',
-  text:[PV+'8. Quelle coïncidence.','Rosato, N. Stagiaire. J’ai consulté vos archives. Vous avez six chats. Madame en avait six. Une noire peureuse, une doyenne qui dort tout le temps, un orange collant, une déserteuse chez les voisins… Même distribution.','Je ne dis rien. Je note.','Voici votre énigme. Voici la liste de vos chats d’après mes archives : HK, Chaussette, Pincette, Nala, Biscotte, Ciboulette. Elle contient une erreur. Touchez-la. Et gardez-la en tête.'],
+  text:[PV+'8. Quelle coïncidence.','Rosato, N. Stagiaire. J’ai consulté vos archives. Vous avez six chats. Madame en avait six. Une noire peureuse, une doyenne qui dort tout le temps, un orange collant, une déserteuse chez les voisins… Même distribution.','Je ne dis rien. Je note.','Carte postale de l’inspectrice, reçue ce matin : « Tout va bien. Ne cassez rien. Surtout pas ce qui est intéressant. » Elle a du goût pour les devises.','Voici votre énigme. Voici la liste de vos chats d’après mes archives : HK, Chaussette, Pincette, Nala, Biscotte, Ciboulette. Elle contient une erreur. Touchez-la. Et gardez-la en tête.'],
   hint:'Vous connaissez vos chats mieux que mes archives.',ok:'Biscotte. Le vrai nom est Yin. Biscotte, c’était le chat de Madame. Gardez-le en tête.',
   p:{items:['HK','Chaussette','Pincette','Nala','Biscotte','Ciboulette'].map(function(x){return {id:x.toLowerCase(),label:x}}),ok:['biscotte'],ans:'Biscotte (le vrai nom est Yin)',cols:2}},
 
@@ -549,7 +549,7 @@ var DAYS=[
   p:{givens:[[1,0,0,4],[0,4,1,0],[2,0,0,3],[0,3,2,0]],solution:[[1,2,3,4],[3,4,1,2],[2,1,4,3],[4,3,2,1]],grey:[1,4,10,15],ans:'2341'}},
 
  {n:18,title:'L’autopsie',kind:'DÉCHIFFRER',hier:'2341, et pas d’effraction',wd:'tiles',
-  text:[PV+'18. L’autopsie.','Le docteur Pouls rend son rapport. Il écrit très vite. Pas de violence, pas de poison, pas d’angoisse. Il précise que Madame avait « le sourire d’une femme comblée » et qu’on ne s’en étonnera pas.','Il a écrit la cause du décès sur le dossier. Les lettres ont dansé.','Voici votre énigme. Neuf lettres : U, L, R, E, N, E, L, A, T. Remettez-les en ordre.'],
+  text:[PV+'18. L’autopsie.','Le docteur Pouls rend son rapport. Il écrit très vite. Pas de violence, pas de poison, pas d’angoisse. Il précise que Madame avait « le sourire d’une femme comblée » et qu’on ne s’en étonnera pas.','Il a écrit la cause du décès sur le dossier. Les lettres ont dansé. Il sent légèrement le clou de girofle. Il met cela sur le compte du savon de la morgue.','Voici votre énigme. Neuf lettres : U, L, R, E, N, E, L, A, T. Remettez-les en ordre.'],
   hint:'Cela commence par un N, et cela finit comme « belle ».',ok:'Naturelle. Plus de meurtre : il reste le faux testament.',
   p:{letters:['U','L','R','E','N','E','L','A','T'],word:'NATURELLE',ans:'NATURELLE'}},
 
@@ -574,7 +574,7 @@ var DAYS=[
   p:{stmts:[['A','La bougie a été allumée à 3 h du matin.'],['B','La véranda est restée fermée toute la nuit.'],['C','Le testament est authentique.']],truth:[false,false,false],ans:'Aucune preuve n’était vraie'}},
 
  {n:23,title:'Les trois clés',kind:'DÉDUIRE',hier:'aucune preuve n’était vraie',wd:'seq',
-  text:[PV+'23. Les trois clés.','Le coffre a trois clés. La première pend au cou de Madame. La deuxième est chez le notaire. La troisième a quitté la région en 2011, dans le peignoir de Raymond, troisième mari de Madame, noyé dans l’étang. Raymond n’a pas fait de commentaire.','Le journal de l’alarme a noté cinq entrées : vingt-deux heures trente, véranda. Vingt-trois heures quinze, porte. Zéro heure trente, véranda. Six heures, porte. Sept heures vingt, porte.','Voici votre énigme. Reprenez l’ordre d’arrivée des visiteurs du jour quatre. Firmin n’entre jamais : il reste au jardin. Associez les cinq autres aux cinq entrées du journal.'],
+  text:[PV+'23. Les trois clés.','Le coffre a trois clés. La première pend au cou de Madame. La deuxième est chez le notaire. La troisième a quitté la région en 2011, dans le peignoir de Raymond, troisième mari de Madame. Raymond n’a pas fait de commentaire.','Le journal de l’alarme, enclenchée au départ de Mélusine, a noté cinq mouvements : vingt-deux heures trente, véranda. Vingt-trois heures quinze, porte. Zéro heure trente, véranda. Six heures, porte. Sept heures vingt, porte. Le mimosa de la voisine, toujours aussi abominable, n’a rien signalé.','Voici votre énigme. Reprenez l’ordre d’arrivée des visiteurs du jour quatre. Firmin n’entre jamais : il reste au jardin. Associez les cinq autres aux cinq mouvements du journal, dans l’ordre : le premier est le départ de Mélusine, les quatre autres sont des arrivées.'],
   hint:'Prenez l’ordre du jour 4, sans Firmin, et suivez le journal.',ok:'Maître Tabellion est entré à 6 h 00, et il possède une clé du coffre. Le notaire est de plus en plus intéressant.',
   p:{items:['melusine','baptiste','ginette','tabellion','pouls'],target:['melusine','baptiste','ginette','tabellion','pouls'],byId:byId(),log:[['22 h 30','véranda'],['23 h 15','porte'],['0 h 30','véranda'],['6 h 00','porte'],['7 h 20','porte']],ans:'Maître Tabellion'}},
 
