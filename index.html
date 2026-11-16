@@ -565,7 +565,7 @@ function afterWin(d){
   clearTimeout(backT);
   say('',200).then(function(){
     clearTimeout(backT);
-    backT=setTimeout(function(){if(curDay===d.n){curDay=null;odAbort();renderDays()}},10000);
+    backT=setTimeout(function(){if(curDay===d.n){curDay=null;odAbort();renderDays()}},5000);
   });
 }
 function odAns(d,v){if(d.wd&&!d.ans)return '<div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';
@@ -739,7 +739,7 @@ function odSheet(d,first){
   h+='<div class="odbtns" id="odb'+d.n+'"></div>'+(d.minuit?'':'<div class="pv29">Procès-verbal établi le 29 novembre.</div>')+'</div>';return h;
 }
 var curDay=null;
-function fmtX(t,s){return t.replace(/\s+(?=\d\)\s)/g,s).replace(/([.!])\s+(?=[^.!?]*\?\s*$)/,'$1'+s).replace(/\.\s+(?=Prenez )/,'.'+s)}
+function fmtX(t,s){return t.replace(/\s+(?=\d\)\s)/g,s).replace(/([.!])\s+(?=[^.!?]*\?\s*$)/,'$1'+s).replace(/\.\s+(?=Prenez )/,'.'+s).replace(/(Voici votre énigme\.)\s+/,'$1'+s)}
 function fmtL(t){return fmtX(t,'<br>')}
 function dayObj(n){if(n>31)return odFind(32);var o=odFind(n);if(o)return o;for(var i=0;i<DAYS.length;i++)if(DAYS[i].n===n)return DAYS[i];return null}
 function todayN(){var m=0;for(var n=1;n<=31;n++)if(unlocked(n))m=n;return m}

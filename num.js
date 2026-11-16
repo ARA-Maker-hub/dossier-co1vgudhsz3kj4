@@ -41,7 +41,7 @@ T.rooms={
   var done=solved(d.n),lab=d.p.labels,h='<div class="rooms">';
   d.p.grid.forEach(function(num){
     var on=s.sel.indexOf(num)>=0||(done&&lab[num]&&num!==9);
-    h+='<button class="rm'+(on?' on':'')+(num===9?' sal':'')+'" data-a="t" data-v="'+num+'"'+((done||num===9)?' disabled':'')+'><b>'+num+'</b><i>'+(num===9?'salon':(done&&lab[num])||'')+'</i></button>';
+    h+='<button class="rm'+(on?' on':'')+(num===9?' sal':'')+'" data-a="t" data-v="'+num+'"'+((done||num===9)?' disabled':'')+'><b>'+num+'</b><i>'+(num===9?'salon':(done&&lab[num]?String(lab[num]).replace('bibliothèque','biblio.'):''))+'</i></button>';
   });
   return h+'</div><p class="wcap">'+(done?'Plan retenu.':'Touchez trois pièces ('+s.sel.length+'/3).')+'</p>';
  },
