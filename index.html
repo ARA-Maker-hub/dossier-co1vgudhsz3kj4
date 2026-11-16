@@ -299,8 +299,40 @@ input::placeholder,textarea::placeholder{font-size:17px;font-weight:700}
 .cbt{font-family:RB;font-size:22px;color:#e8d9b8;margin-bottom:8px}
 .codebox .odfb{color:#e8d9b8}
 .cell.key::after{content:'🔑';position:absolute;right:3px;bottom:1px;font-size:11px}
+
+/* ---- accueil unique + scan QR (16.11.2026) ---- */
+#welcome{background:repeating-linear-gradient(92deg,#2a1c13 0 38px,#24170f 38px 41px,#2e2016 41px 96px,#21150d 96px 99px);overflow-y:auto;-webkit-overflow-scrolling:touch}
+#welcome .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top) + 22px) 16px calc(env(safe-area-inset-bottom) + 22px)}
+#welcome .wsheet{position:relative;width:100%;max-width:380px;background:var(--paper);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .1 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");color:var(--txt);padding:22px 18px 20px;border-radius:2px;box-shadow:0 1px 0 #cdbb93,4px 5px 0 -1px #e9dcbc,0 16px 40px #000c;transform:rotate(-.6deg)}
+#welcome h2{font-family:AS,SE,serif;font-weight:400;text-transform:uppercase;font-size:27px;line-height:1.02;margin:12px 0 10px;color:var(--txt)}
+#welcome h2 em{font-style:normal;color:var(--blood)}
+#welcome .wi{display:flex;gap:12px;align-items:flex-start;margin:14px 0}
+#welcome .wi b{flex:none;font-size:30px;line-height:1;width:38px;text-align:center}
+#welcome .wi p{font-size:17px;font-weight:700;line-height:1.38;color:#2c2720}
+#welcome .wi p i{font-style:normal;color:var(--blood)}
+#welcome .btn{margin-top:12px}
+#welcome .btn.ghost{color:#4a3a22;border-color:#6b5434}
+#welcome .wsig{font-family:RB,SE,cursive;font-size:30px;line-height:1.05;color:var(--violet);text-align:center;margin-top:18px}
+.gate .btn.ghost,.codebox .btn.ghost{color:#4a3a22;border-color:#6b5434}
+.codebox .btn.ghost{color:#e8d9b8;border-color:#8a7348}
+#qrs{position:fixed;inset:0;z-index:30;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px}
+#qrs.on{display:flex}
+#qrs video{width:100%;max-width:420px;aspect-ratio:1;object-fit:cover;border-radius:6px;background:#111}
+#qrs p{font-family:RB,SE,cursive;font-size:26px;color:#e8d9b8}
+#qrs .btn{max-width:420px}
 </style><link rel="stylesheet" href="num.css"><script src="gates.js"></script><script src="num.js"></script></head><body>
 <div id="app">
+<!-- ACCUEIL (une seule fois) -->
+<section class="scr" id="welcome"><div class="wrap"><div class="wsheet">
+ <span class="stp">À lire avant d’ouvrir le dossier</span>
+ <h2>Avant de <em>commencer</em></h2>
+ <div class="wi"><b>🔊</b><p>Sors ton iPhone du <i>mode silence</i> et monte un peu le volume : l’enquête se raconte à voix haute.</p></div>
+ <button class="btn ghost" id="wtest">Tester le son</button>
+ <div class="wi" id="wins"><b>📲</b><p>Ajoute ce carnet à ton <i>écran d’accueil</i> : touche le bouton Partager, puis « Sur l’écran d’accueil ». Il s’ouvrira comme une application.</p></div>
+ <div class="wi"><b>🕯️</b><p>Chaque jour, ouvre le carnet et touche <i>« Scanner un QR »</i> devant la case du jour. Si ça ne marche pas, tape le code à 6 chiffres.</p></div>
+ <div class="wsig">Fait avec beaucoup d’amour<br>par Driss &amp; Claude 😉</div>
+ <button class="btn" id="wgo">Ouvrir le dossier</button>
+</div></div></section>
 <!-- OUVERTURE -->
 <section class="scr on" id="intro">
  <canvas id="rain"></canvas>
@@ -340,7 +372,7 @@ input::placeholder,textarea::placeholder{font-size:17px;font-weight:700}
  <div id="tabs"><button data-p="days" class="on">Jours</button><button data-p="susp">Visiteurs</button><button data-p="cats">Chats</button><button data-p="night">Nuit</button><button data-p="notes">Notes</button></div>
 </section>
 </div>
-<div id="toast"></div>
+<div id="toast"></div><div id="qrs"><video id="qrv" playsinline muted></video><p>Place le QR dans le cadre</p><button class="btn ghost" id="qrx">Annuler</button></div>
 <script>
 (function(){
 var DAYS=[{"n": 1, "title": "Ne touchez à rien", "kind": "DEVINER"}, {"n": 2, "title": "Le plan du manoir", "kind": "DÉDUIRE"}, {"n": 3, "title": "Six témoins à fourrure", "kind": "DÉDUIRE"}, {"n": 4, "title": "Six visiteurs, zéro modestie", "kind": "LOGIQUE"}, {"n": 5, "title": "Le neveu", "kind": "DÉCHIFFRER"}, {"n": 6, "title": "Mélusine ne fait que des dos", "kind": "DÉCHIFFRER"}, {"n": 7, "title": "La voisine aux jumelles", "kind": "LOGIQUE"}, {"n": 8, "title": "Quelle coïncidence", "kind": "DÉDUIRE"}, {"n": 9, "title": "Le docteur Pouls", "kind": "CALCULER"}, {"n": 10, "title": "L’encre qui se cache", "kind": "À FAIRE"}, {"n": 11, "title": "Combien de temps a-t-elle brûlé ?", "kind": "CALCULER"}, {"n": 12, "title": "Le testament", "kind": "REPÉRER"}, {"n": 13, "title": "Firmin ne parle qu’aux roses", "kind": "DÉCHIFFRER"}, {"n": 14, "title": "Pincette, la solitaire", "kind": "DÉDUIRE"}, {"n": 15, "title": "Le neveu a des dettes", "kind": "CALCULER"}, {"n": 16, "title": "Mélusine fait ses comptes", "kind": "CALCULER"}, {"n": 17, "title": "Le code du coffre", "kind": "DÉDUIRE"}, {"n": 18, "title": "L’autopsie", "kind": "DÉCHIFFRER"}, {"n": 19, "title": "La boîte de Firmin", "kind": "DÉDUIRE"}, {"n": 20, "title": "Quatre petits coupables", "kind": "LOGIQUE"}, {"n": 21, "title": "Il faisait combien, Madame ?", "kind": "CALCULER"}, {"n": 22, "title": "Je vous arrête", "kind": "REPÉRER"}, {"n": 23, "title": "Les trois clés", "kind": "DÉDUIRE"}, {"n": 24, "title": "L’enquête n’est pas finie", "kind": "REPÉRER"}];
@@ -352,7 +384,7 @@ var soundOn=true, AC=null, master=null, rainGain=null, RAIN=.03, DUCK=.012;
 function duck(on){if(rainGain&&AC&&soundOn){rainGain.gain.cancelScheduledValues(AC.currentTime);rainGain.gain.linearRampToValueAtTime(on?DUCK:RAIN,AC.currentTime+.4)}}
 function toast(t){var e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove('on')},2600)}
 /* ---------- audio ---------- */
-function startAudio(){
+function startAudio(){audioPlayback();
   try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){AC=null;return}
   master=AC.createGain();master.gain.value=.9;master.connect(AC.destination);
   var len=AC.sampleRate*2,buf=AC.createBuffer(1,len,AC.sampleRate),d=buf.getChannelData(0);
@@ -399,6 +431,11 @@ function stopVoice(){
   if(curAudio){try{curAudio.pause()}catch(e){}curAudio=null}
   if(curFin){var f=curFin;curFin=null;f()}
 }
+var apOK=false;
+function audioPlayback(){
+  try{if(navigator.audioSession&&navigator.audioSession.type!=='playback')navigator.audioSession.type='playback'}catch(e){}
+  if(!apOK){apOK=true;try{var s=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');s.setAttribute('playsinline','');var p=s.play();if(p&&p.catch)p.catch(function(){apOK=false})}catch(e){apOK=false}}
+}
 function voxUrl(k){var n=k-100;return 'v/greffier_'+(n<10?'0':'')+n+'.mp3'}
 function loadVox(k){
   if(vbuf[k])return vbuf[k];
@@ -417,7 +454,7 @@ function say(text,k){
     }
     try{
       if(AC&&AC.state==='suspended')AC.resume();
-      loadVox(k).then(function(buf){
+      ensureAC();if(AC&&AC.state==='suspended')AC.resume();loadVox(k).then(function(buf){
         if(done)return;var s=AC.createBufferSource();s.buffer=buf;s.connect(AC.destination);s.onended=fin;curSrc=s;s.start();
       }).catch(function(e){if(e==='nofile'){fin();return}viaElement()});
     }catch(e){viaElement()}
@@ -539,8 +576,8 @@ function tryCode(c){
   for(var k in GATE){if(hx('sv'+k+':'+c)===GATE[k]){var n=+k;if(!unlocked(n))return 'early:'+n;store.s('u'+n,'1');curDay=n;return n}}
   return 'bad';
 }
-function codeBox(){return '<div class="codebox"><div class="cbt">Une bougie à code ? Tapez-le ici.</div><input id="gcode" inputmode="numeric" maxlength="6" placeholder="6 chiffres"><button class="btn" data-g="go">Ouvrir</button><div class="odfb" id="gfb"></div></div>'}
-function gateHTML(n){return '<div class="sheet gate"><div class="seal">🔒</div><h2>Procès-verbal scellé</h2><p class="gp">Scannez le QR gravé sur la bougie n° '+n+', ou tapez ici le code à 6 chiffres.</p><input id="gcode" inputmode="numeric" maxlength="6" placeholder="• • • • • •"><button class="btn" data-g="go">Lever le scellé</button><div class="odfb" id="gfb"></div></div>'}
+function codeBox(){return '<div class="codebox"><div class="cbt">Une bougie à code ? Tapez-le ici.</div><input id="gcode" inputmode="numeric" maxlength="6" placeholder="6 chiffres"><button class="btn" data-g="go">Ouvrir</button><button class="btn ghost" data-scan="1">📷 Scanner un QR</button><div class="odfb" id="gfb"></div></div>'}
+function gateHTML(n){return '<div class="sheet gate"><div class="seal">🔒</div><h2>Procès-verbal scellé</h2><p class="gp">Scannez le QR gravé sur la bougie n° '+n+', ou tapez ici le code à 6 chiffres.</p><input id="gcode" inputmode="numeric" maxlength="6" placeholder="• • • • • •"><button class="btn" data-g="go">Lever le scellé</button><button class="btn ghost" data-scan="1">📷 Scanner un QR</button><div class="odfb" id="gfb"></div></div>'}
 function deepLink(){
   var m=(location.hash+location.search).match(/[#?&]c=(\d{6})|j\d{1,2}-(\d{6})/);if(!m)return null;
   var r=tryCode(m[1]||m[2]);return r==='bad'?null:(typeof r==='number'?'ok':'early');
@@ -557,7 +594,7 @@ $('#dlist').addEventListener('click',function(e){
 var odRun=0,odCur=0;
 function ODIDX(n){return n===1?15:n>31?14:n<25?100+n:n-25+7}
 function odFind(n){for(var i=0;i<ODETTE.length;i++)if(ODETTE[i].n===n)return ODETTE[i];return null}
-function ensureAC(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}}
+function ensureAC(){audioPlayback();if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}}
 function odParas(d){return d.text.map(function(t){return '<p>'+fmtL(t)+'</p>'}).join('')}
 function odPuz(d){var h='';if(d.puzzle)h+='<p class="odq">'+fmtL(d.puzzle)+'</p>';if(d.mirror&&0)h+='<div class="odmirror">'+d.mirror+'</div>';if(d.will&&0)h+='<div class="odwill">'+d.will.map(function(l){return '<p>'+l+'</p>'}).join('')+'</div>';return h+odW(d)}
 function odBtns(n,st){
@@ -745,10 +782,54 @@ document.querySelectorAll('#tabs button').forEach(function(b){b.addEventListener
 /* mode test : 7 touches sur le titre */
 var tc=0,tt=0;$('#ttl').addEventListener('click',function(){var n=Date.now();if(n-tt>1500)tc=0;tt=n;tc++;if(tc>=7){tc=0;test=!test;store.s('test',test?'1':'0');renderDays();toast(test?'Mode test : tout est ouvert':'Mode test coupé')}});
 $('#replay').addEventListener('click',function(){location.hash='#intro';location.reload()});
+/* ---------- scan QR (caméra, jsQR chargé à la demande) ---------- */
+var qrStream=null,qrRun=false,qrLoad=null;
+function loadJsQR(){if(window.jsQR)return Promise.resolve();if(qrLoad)return qrLoad;qrLoad=new Promise(function(res,rej){var s=document.createElement('script');s.src='qrscan.js';s.onload=res;s.onerror=function(){qrLoad=null;rej()};document.head.appendChild(s)});return qrLoad}
+function qrStop(){qrRun=false;if(qrStream){qrStream.getTracks().forEach(function(t){t.stop()});qrStream=null}var o=$('#qrs');if(o)o.classList.remove('on');var v=$('#qrv');if(v)v.srcObject=null}
+function qrCode(txt){var m=String(txt).match(/j\d{1,2}-(\d{6})|[#?&]c=(\d{6})|^\s*(\d{6})\s*$/);return m?(m[1]||m[2]||m[3]):null}
+function qrStart(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){toast('Caméra indisponible : tape le code à 6 chiffres.');return}
+  audioPlayback();
+  loadJsQR().then(function(){return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false})}).then(function(st){
+    qrStream=st;var v=$('#qrv');v.srcObject=st;v.setAttribute('playsinline','');v.muted=true;return v.play()
+  }).then(function(){
+    $('#qrs').classList.add('on');qrRun=true;
+    var v=$('#qrv'),c=document.createElement('canvas'),x=c.getContext('2d',{willReadFrequently:true});
+    (function tick(){
+      if(!qrRun)return;
+      if(v.readyState>=2&&v.videoWidth){
+        var w=Math.min(720,v.videoWidth),h=Math.round(w*v.videoHeight/v.videoWidth);c.width=w;c.height=h;x.drawImage(v,0,0,w,h);
+        var d=x.getImageData(0,0,w,h),r=window.jsQR(d.data,w,h,{inversionAttempts:'attemptBoth'});
+        if(r&&r.data){var code=qrCode(r.data);if(code){
+          var res=tryCode(code);
+          if(typeof res==='number'){qrStop();ding();renderDays();return}
+          qrStop();oops();toast(res.indexOf('early')===0?'Ce dossier est encore scellé.':'Code inconnu.');return}}
+      }
+      setTimeout(tick,120);
+    })();
+  }).catch(function(){qrStop();toast('Caméra non autorisée : tape le code à 6 chiffres.')});
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest?e.target.closest('[data-scan]'):null;
+  if(b){qrStart();return}
+  if(e.target.id==='qrx')qrStop();
+});
 var DL=deepLink();renderDays();bindSave();
 if(DL){store.s('seen','1');$('#intro').classList.remove('on');$('#book').classList.add('on');if(DL==='early')toast('Ce dossier est encore scellé.')}
 if(store.g('snd')==='0'){setSound(false)}
 if(location.hash==='#carnet'||(store.g('seen')==='1'&&location.hash!=='#intro')){$('#intro').classList.remove('on');$('#book').classList.add('on')}
+/* ---------- accueil unique ---------- */
+(function(){
+  if(store.g('welcome')==='1')return;
+  var wasBook=$('#book').classList.contains('on');
+  $('#intro').classList.remove('on');$('#book').classList.remove('on');$('#welcome').classList.add('on');
+  try{if(window.navigator.standalone||(window.matchMedia&&matchMedia('(display-mode:standalone)').matches)){var wi=$('#wins');if(wi)wi.style.display='none'}}catch(e){}
+  $('#wtest').addEventListener('click',function(){audioPlayback();ensureAC();if(AC&&AC.state==='suspended')AC.resume();miaou();setTimeout(ding,650)});
+  $('#wgo').addEventListener('click',function(){
+    store.s('welcome','1');audioPlayback();ensureAC();if(AC&&AC.state==='suspended')AC.resume();
+    $('#welcome').classList.remove('on');(wasBook?$('#book'):$('#intro')).classList.add('on');
+  });
+})();
 window.AV={store:store,$:$,say:say,ding:ding,oops:oops,blip:blip,miaou:miaou,burst:burst,toast:toast,okMsg:okMsg,odFind:odFind,ac:function(){ensureAC();try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}return AC}};
 })();
 </script></body></html>
