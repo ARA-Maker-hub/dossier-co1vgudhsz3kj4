@@ -19,8 +19,8 @@ function win(n,ans){
   var a=A(),d=dayOf(n);if(!d||solved(n))return;
   a.store.s('ok'+n,'1');a.store.s('a'+n,ans||'ok');
   var fb=$id('odfb'+n);if(fb)fb.innerHTML=a.okMsg(d);
-  if(d.gr)a.say('',16).then(function(){if(a.afterWin)a.afterWin(d)});else a.ding();
-  a.burst($id('wg'+n),['🕯️','✨','⭐']);
+  if(d.gr)a.say('',300+n).then(function(){if(a.afterWin)a.afterWin(d)});else a.ding();
+  a.burst($id('wg'+n),['🔍','✨','⭐']);
 }
 function miss(n,el){
   var a=A(),d=dayOf(n),t=(+a.store.g('tr'+n)||0)+1;a.store.s('tr'+n,String(t));
