@@ -757,7 +757,7 @@ function renderDays(){
   if(curDay){
     var d=dayObj(curDay);
     if(!d||!unlocked(d.n)){curDay=null}
-    else if(GATE[d.n]&&store.g('u'+d.n)!=='1'){$('#dhint').textContent='';$('#dlist').innerHTML=BK+gateHTML(d.n);$('#p-days').scrollTop=0;return}
+    else if(!test&&GATE[d.n]&&store.g('u'+d.n)!=='1'){$('#dhint').textContent='';$('#dlist').innerHTML=BK+gateHTML(d.n);$('#p-days').scrollTop=0;return}
     else{
       var first=!test&&d.n===todayN();
       $('#dhint').textContent='';
@@ -774,7 +774,7 @@ function renderDays(){
   h+='<button class="cell open nov" data-nov="1">30<small>nov.</small></button>';
   for(var n=1;n<=max;n++){
     var o=unlocked(n),ans=(store.g('a'+n)||'').trim();
-    h+='<button class="cell'+(o?' open':' lock')+(!test&&n===t?' today':'')+(n>=25?' od':'')+(ans?' done':'')+(GATE[n]&&store.g('u'+n)!=='1'?' key':'')+'"'+(o?' data-cal="open" data-n="'+n+'"':' disabled')+'>'+n+'</button>';
+    h+='<button class="cell'+(o?' open':' lock')+(!test&&n===t?' today':'')+(n>=25?' od':'')+(ans?' done':'')+(!test&&GATE[n]&&store.g('u'+n)!=='1'?' key':'')+'"'+(o?' data-cal="open" data-n="'+n+'"':' disabled')+'>'+n+'</button>';
   }
   if(unlocked(31)){var mo=unlocked(32);h+='<button class="cell mid'+(mo?' open':' lock')+'"'+(mo?' data-cal="open" data-n="32"':' disabled')+'>✶ 1er janvier</button>'}
   h+='</div>'+codeBox()+'<button class="btn ghost" data-refresh="1">↻ Mettre à jour l’app</button>';
