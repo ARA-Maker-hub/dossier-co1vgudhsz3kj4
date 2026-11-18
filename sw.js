@@ -2,11 +2,13 @@
 self.addEventListener('install', function () { self.skipWaiting(); });
 self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
 self.addEventListener('push', function (e) {
+  var d = new Date();
+  var second = d.getMonth() === 11 && d.getDate() === 24 && d.getHours() >= 13;
   e.waitUntil(self.registration.showNotification('Brigade des chats', {
-    body: 'Un nouveau procès-verbal vous attend, stagiaire Rosato.',
+    body: second ? 'Un second procès-verbal vient de tomber, stagiaire Rosato.' : 'Un nouveau procès-verbal vous attend, stagiaire Rosato.',
     icon: 'icon-192.png',
     badge: 'icon-192.png',
-    tag: 'pv-du-jour'
+    tag: second ? 'pv-24-second' : 'pv-du-jour'
   }));
 });
 self.addEventListener('notificationclick', function (e) {
