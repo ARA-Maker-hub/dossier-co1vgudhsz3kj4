@@ -446,7 +446,7 @@ function audioPlayback(){
   try{if(navigator.audioSession&&navigator.audioSession.type!=='playback')navigator.audioSession.type='playback'}catch(e){}
   if(!apOK){apOK=true;try{var s=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');s.setAttribute('playsinline','');var p=s.play();if(p&&p.catch)p.catch(function(){apOK=false})}catch(e){apOK=false}}
 }
-function voxUrl(k){if(k===200)return 'v/greffier_demain.mp3';if(k===201)return 'v/greffier_fin.mp3';if(k>=300){var m=k-300;return 'v/greffier_ok_'+(m<10?'0':'')+m+'.mp3'}var n=k-100;return 'v/greffier_'+(n<10?'0':'')+n+'.mp3'}
+function voxUrl(k){if(k>=500)return 'v/odette_ok_'+(k-500)+'.mp3';if(k>=450)return 'v/odette_non_'+(k-450)+'.mp3';if(k>=400)return 'v/odette_q_'+(k-400)+'.mp3';if(k===200)return 'v/greffier_demain.mp3';if(k===201)return 'v/greffier_fin.mp3';if(k>=300){var m=k-300;return 'v/greffier_ok_'+(m<10?'0':'')+m+'.mp3'}var n=k-100;return 'v/greffier_'+(n<10?'0':'')+n+'.mp3'}
 function loadVox(k){
   if(vbuf[k])return vbuf[k];
   if(k>=100){vbuf[k]=fetch(voxUrl(k)).then(function(r){if(!r.ok)throw 'nofile';return r.arrayBuffer()}).then(function(ab){return new Promise(function(res,rej){AC.decodeAudioData(ab,res,rej)})});return vbuf[k]}
@@ -562,6 +562,9 @@ ODETTE.unshift(J1);if(window.AVN){window.AVN.days.forEach(function(d){ODETTE.pus
 var SOL={25:['3','trois','casier 3'],26:['anselme pouls','pouls','docteur pouls'],27:['cabane'],28:['genoux','chaussette'],30:['elle vit','ellevit'],31:['odette']};
 ODETTE.push({od:1,n:240,no:24,title:'Affaire classée',su:'Procès-verbal du matin',gr:1,nopv:1,wd:1,btn:'Classer l’affaire',ok:'Affaire classée.',text:['Procès-verbal n° 24. Affaire classée.','Maître Tabellion a signé des aveux complets. Faux testaments, fausse date, fausse modestie : il voulait la maison, les meubles et les six chats pour ouvrir un cabinet d’expertises. Évidemment.','Il est menotté. Pincette lui a craché dessus. Ce n’est pas une preuve, mais son panier est vengé.','Le coffre est refermé. Les dettes du neveu sont épongées par la justice. Le docteur Pouls a repris ses tisanes du jeudi, en sifflotant.','Quant à vous, stagiaire Rosato, la brigade des chats vous décharge de vos fonctions. Vous avez survécu aux moustaches, aux corvées et aux mensonges. Dossier classé.','Rangez ce carnet. Éteignez la dernière bougie. Fermez le dossier pour de bon.','Le manoir de Pelmont-Duvet vous remercie.','Joyeux Noël, ma chère Nathalie Rosato.']});
 ODETTE.forEach(function(d){if(SOL[d.n])d.sol=SOL[d.n]});
+var OKTXT={"25":"Casier 3. Évidemment. Elle a toujours préféré le milieu aux extrémités.","26":"Anselme Pouls. Le docteur signe vite, et à l’envers quand il a mauvaise conscience.","27":"Cabane. Firmin a tout caché là-bas, entre la bêche et les secrets. Il n’a rien dit. Il ne dit jamais rien.","28":"Sur les genoux de Madame. Chaussette n’a pas quitté sa maîtresse de la nuit, parce qu’elle était chaude. Les chats ont leur logique.","29":"Gaston, la chute d’échelle. Hubert, le champignon. Raymond, la noyade. Trois accidents, trois noms. Le dossier est cohérent, et le cimetière aussi.","30":"Elle vit. Lisez toujours le début des lignes : c’est là que les gens mentent le moins.","31":"Odette. Évidemment. Il vous aura fallu un mois, mais vous y êtes arrivée. J’ai deux mots à vous dire, à la nouvelle année."};ODETTE.forEach(function(d){if(OKTXT[d.n])d.ok=OKTXT[d.n]});
+function odOk(n){if(n>=25&&n<=31)setTimeout(function(){say('',500+n)},450)}
+
 function nrm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
 function okMsg(d){return d.btn?d.ok:'<b>✓ Exact.</b> '+(d.ok||'')}
 var backT=null;
@@ -581,11 +584,11 @@ function odCheck(n){
   var a=' '+nrm(el.value)+' ',good=false;
   if(a.trim())d.sol.forEach(function(s){if(a.indexOf(' '+nrm(s)+' ')>=0)good=true});
   var host=el.parentNode;
-  if(good){store.s('ok'+n,'1');fb.innerHTML=okMsg(d);if(d.gr)say('',300+d.n).then(function(){afterWin(d)});else ding();burst(host,['🔍','✨','⭐'])}
+  if(good){store.s('ok'+n,'1');fb.innerHTML=okMsg(d);if(d.gr)say('',300+d.n).then(function(){afterWin(d)});else{ding();odOk(n)}burst(host,['🔍','✨','⭐'])}
   else{
     var t=(+store.g('tr'+n)||0)+1;store.s('tr'+n,String(t));
     fb.innerHTML='Ce n’est pas ça.'+(t>=3&&d.hint?'<br><i>Indice : '+d.hint+'</i>':'');
-    if(d.gr)say('',17);else oops();
+    if(d.gr)say('',17);else{oops();if(n>=25&&n<=31)say('',450+((t-1)%3)+1)}
     el.classList.add('shake');setTimeout(function(){el.classList.remove('shake')},400);
   }
 }
@@ -653,6 +656,7 @@ async function odRead(n){
   if(my!==odRun)return;
   if(d.minuit){odFinale();setTimeout(function(){if(curDay===n&&my===odRun)triOpen(2)},3600)}
   odCur=0;store.s('od'+n,'1');$('#odp'+n).hidden=false;odBtns(n,'seen');
+  if(n>=25&&n<=31&&!d.minuit)say('',400+n);
 }
 
 function blip(f1,f2,dur,vol){try{ensureAC();if(!AC)return;var o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.type='triangle';o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(vol||.12,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+dur+.02)}catch(e){}}
@@ -734,7 +738,7 @@ $('#dlist').addEventListener('click',function(e){
     wset(28,s);wrap.innerHTML=wRender(28);return}
   if(w==='hus'){s=wget(29,{sel:-1,ok:[0,0,0]});if(s.ok[i])return;s.sel=(s.sel===i)?-1:i;s.shake=-1;wset(29,s);wrap.innerHTML=wRender(29);return}
   if(w==='dth'){s=wget(29,{sel:-1,ok:[0,0,0]});if(s.sel<0||s.ok[i])return;
-    if(s.sel===i){s.ok[i]=1;s.sel=-1;s.shake=-1;wset(29,s);blip(400,800,.2,.1);wrap.innerHTML=wRender(29);if(s.ok[0]&&s.ok[1]&&s.ok[2]){store.s('ok29','1');ding();burst(wrap)}}
+    if(s.sel===i){s.ok[i]=1;s.sel=-1;s.shake=-1;wset(29,s);blip(400,800,.2,.1);wrap.innerHTML=wRender(29);if(s.ok[0]&&s.ok[1]&&s.ok[2]){store.s('ok29','1');ding();burst(wrap);var f9=$('#odfb29');if(f9)f9.innerHTML=okMsg(odFind(29));odOk(29);pvRefresh(29)}}
     else{oops();s.shake=i;wset(29,s);wrap.innerHTML=wRender(29)}return}
 });
 function odSheet(d,first){
