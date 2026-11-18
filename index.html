@@ -571,7 +571,7 @@ function afterWin(d){
   clearTimeout(backT);
   say('',200);
 }
-function odAns(d,v){if(d.btn){if(store.g('ok'+d.n)==='1')return '<div class="odfb" id="odfb'+d.n+'"><b>✓ Affaire classée.</b></div>';return '<button class="btn" data-act="classer" data-n="'+d.n+'">'+d.btn+'</button><div class="odfb" id="odfb'+d.n+'"></div>'}if(d.wd&&!d.ans)return '<div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';
+function odAns(d,v){if(d.n===29)return '<div class="odfb" id="odfb29">'+(store.g('ok29')==='1'?okMsg(d):'')+'</div>';if(d.btn){if(store.g('ok'+d.n)==='1')return '<div class="odfb" id="odfb'+d.n+'"><b>✓ Affaire classée.</b></div>';return '<button class="btn" data-act="classer" data-n="'+d.n+'">'+d.btn+'</button><div class="odfb" id="odfb'+d.n+'"></div>'}if(d.wd&&!d.ans)return '<div class="odfb" id="odfb'+d.n+'">'+(store.g('ok'+d.n)==='1'?okMsg(d):'')+'</div>';
   var n=d.n,h='<input data-save="a'+n+'" placeholder="Votre réponse" value="'+v+'">';
   if(d.sol)h+='<button class="btn" data-act="check" data-n="'+n+'">Valider</button><div class="odfb" id="odfb'+n+'">'+(store.g('ok'+n)==='1'?okMsg(d):'')+'</div>';
   return h;
@@ -774,7 +774,7 @@ function renderDays(){
   h+='<button class="cell open nov" data-nov="1">30<small>nov.</small></button>';
   for(var n=1;n<=max;n++){
     var o=unlocked(n),ans=(store.g('a'+n)||'').trim();
-    h+='<button class="cell'+(o?' open':' lock')+(!test&&n===t?' today':'')+(n>=25?' od':'')+(ans?' done':'')+(!test&&GATE[n]&&store.g('u'+n)!=='1'?' key':'')+'"'+(o?' data-cal="open" data-n="'+n+'"':' disabled')+'>'+n+'</button>';
+    h+='<button class="cell'+(o?' open':' lock')+(!test&&n===t?' today':'')+(n>=25?' od':'')+((ans||store.g('ok'+n)==='1'||store.g('cl'+n)==='1')?' done':'')+(!test&&GATE[n]&&store.g('u'+n)!=='1'?' key':'')+'"'+(o?' data-cal="open" data-n="'+n+'"':' disabled')+'>'+n+'</button>';
   }
   if(unlocked(31)){var mo=unlocked(32);h+='<button class="cell mid'+(mo?' open':' lock')+'"'+(mo?' data-cal="open" data-n="32"':' disabled')+'>✶ 1er janvier</button>'}
   h+='</div>'+codeBox()+'<button class="btn ghost" data-refresh="1">↻ Mettre à jour l’app</button>';
