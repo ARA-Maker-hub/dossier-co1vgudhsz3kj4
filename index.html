@@ -781,7 +781,7 @@ function renderDays(){
     h+='<button class="cell'+(o?' open':' lock')+(!test&&n===t?' today':'')+(n>=25?' od':'')+((ans||store.g('ok'+n)==='1'||store.g('cl'+n)==='1')?' done':'')+(!test&&GATE[n]&&store.g('u'+n)!=='1'?' key':'')+'"'+(o?' data-cal="open" data-n="'+n+'"':' disabled')+'>'+n+'</button>';
   }
   if(unlocked(31)){var mo=unlocked(32);h+='<button class="cell mid'+(mo?' open':' lock')+'"'+(mo?' data-cal="open" data-n="32"':' disabled')+'>✶ 1er janvier</button>'}
-  h+='</div>'+codeBox()+'<button class="btn ghost" data-refresh="1">↻ Mettre à jour l’app</button>';
+  h+='</div>'+codeBox()+'<button class="btn ghost" data-refresh="1">↻ Mettre à jour l’app</button><button class="btn ghost" data-reset="1">⟲ Tout réinitialiser</button>';
   $('#dlist').innerHTML=h;
 }
 $('#dlist').addEventListener('click',function(e){
@@ -941,6 +941,12 @@ document.addEventListener('click',function(e){
   toast('Mise à jour en cours…',4000);
   var fs=['num.js','num.css','gates.js','qrscan.js',location.pathname];
   Promise.all(fs.map(function(f){return fetch(f,{cache:'reload'}).catch(function(){return 0})})).then(function(){location.reload()});
+});
+document.addEventListener('click',function(e){
+  var b=e.target.closest?e.target.closest('[data-reset]'):null;if(!b)return;
+  if(!confirm('Tout réinitialiser ?\n\nLes énigmes résolues, les réponses, les fiches dévoilées et les réglages seront effacés. Cette action est définitive.'))return;
+  try{var ks=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sv_')===0)ks.push(k)}ks.forEach(function(k){localStorage.removeItem(k)})}catch(x){}
+  try{location.replace(location.pathname)}catch(x){location.reload()}
 });
 document.addEventListener('click',function(e){
   var b=e.target.closest?e.target.closest('[data-nov]'):null;if(!b)return;
