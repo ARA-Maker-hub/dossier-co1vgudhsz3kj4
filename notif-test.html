@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Test notif">
+<meta name="theme-color" content="#0d0a12">
+<link rel="manifest" href="notif-test.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Test notifications</title>
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;min-height:100vh;background:#0d0a12;color:#eee7f3;font:17px/1.5 -apple-system,system-ui,sans-serif;padding:max(24px,env(safe-area-inset-top)) 22px 40px}
+  h1{font-size:22px;margin:8px 0 4px}
+  p{color:#bdb3c9;margin:6px 0 18px}
+  button{display:block;width:100%;padding:16px;margin:10px 0;border:0;border-radius:14px;background:#7b4fd6;color:#fff;font:600 17px/1.2 -apple-system,system-ui,sans-serif}
+  button.alt{background:#2a2335}
+  button:disabled{opacity:.45}
+  #etat{margin-top:22px;padding:14px;border-radius:12px;background:#1a1522;color:#d7cce6;font-size:15px;white-space:pre-wrap;min-height:2.5em}
+</style>
+</head>
+<body>
+<h1>Test des notifications</h1>
+<p>Page de test privée. Elle n'affecte pas le carnet.</p>
+<button id="b1">1. Activer les notifications</button>
+<button id="b2" class="alt" disabled>2. M'envoyer une notification de test</button>
+<div id="etat">Prêt.</div>
+<script>
+var API='https://avent-notif.avent-notif.workers.dev';
+var KEY='BAPA_9soiS_GTu9KcHTvN5PNM-B5F114gvh-jkEKetKyoLMotWpT9U0cki8Bo0IXncjGNVl9LDtEXkyLd0VY4KI';
+function $(i){return document.getElementById(i)}
+function log(t){$('etat').textContent=t}
+function u8(b64){var p='='.repeat((4-b64.length%4)%4),s=atob((b64+p).replace(/-/g,'+').replace(/_/g,'/')),a=new Uint8Array(s.length);for(var i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return a}
+var sub=null;
+function standalone(){return window.navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)}
+async function etat0(){
+  var l=[];
+  l.push('Écran d’accueil : '+(standalone()?'oui':'non (ouvre cette page depuis l’icône ajoutée à l’écran d’accueil)'));
+  l.push('Service worker : '+('serviceWorker' in navigator?'oui':'non'));
+  l.push('Notifications : '+('PushManager' in window?'disponibles':'indisponibles ici'));
+  log(l.join('\n'));
+  if('serviceWorker' in navigator&&'PushManager' in window){
+    try{var reg=await navigator.serviceWorker.register('sw.js');await navigator.serviceWorker.ready;
+      sub=await reg.pushManager.getSubscription();
+      if(sub){$('b2').disabled=false;log(l.join('\n')+'\nDéjà activées sur cet appareil.')}
+    }catch(e){log(l.join('\n')+'\nErreur : '+e.message)}
+  }
+}
+$('b1').onclick=async function(){
+  try{
+    log('Demande d’autorisation…');
+    var p=await Notification.requestPermission();
+    if(p!=='granted'){log('Autorisation refusée ('+p+'). À réactiver dans Réglages > Notifications.');return}
+    var reg=await navigator.serviceWorker.ready;
+    sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u8(KEY)});
+    var r=await fetch(API+'/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+    var j=await r.json();
+    log(j.ok?'Notifications activées sur cet appareil.':'Abonnement non enregistré.');
+    $('b2').disabled=!j.ok;
+  }catch(e){log('Erreur : '+e.message)}
+};
+$('b2').onclick=async function(){
+  try{
+    log('Envoi du test…');
+    var r=await fetch(API+'/test',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub)});
+    var j=await r.json();
+    log(j.ok?'Envoyé. La notification arrive dans quelques secondes (verrouille l’écran pour mieux la voir).':'Échec de l’envoi (statut '+j.statut+').');
+  }catch(e){log('Erreur : '+e.message)}
+};
+etat0();
+</script>
+</body>
+</html>
